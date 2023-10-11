@@ -1,5 +1,6 @@
 package br.com.marcusfeitosa.todo_java.user;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ public class UserController  {
     @PostMapping
     public ResponseEntity createNewUser(@RequestBody UserDTO userDTO){
         var user = this.userRepository.findByUsername(userDTO.getUsername());
+        var encryptedPassword = BCrypt.withDefaults().hashToString(12, userDTO.getPassword().toCharArray());
+        userDTO.setPassword(encryptedPassword);
         if(user != null){
             throw new Error("Nome de usuário já cadastrado");
         }else {

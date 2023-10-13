@@ -22,7 +22,6 @@ public class FilterTaskAuth extends OncePerRequestFilter {
 
         var servelPath = request.getServletPath();
         if(servelPath.equals("/tasks")){
-            System.out.println("Entrei no filtro");
             var authorization = request.getHeader("Authorization");
             var encryptedUserPassword = authorization.substring("Basic".length()).trim();
             byte[] decryptedUserPassword = Base64.getDecoder().decode(encryptedUserPassword);
@@ -36,17 +35,15 @@ public class FilterTaskAuth extends OncePerRequestFilter {
             if( databaseUsername == null){
                 response.sendError(401, "Nome de Usuário não encontrado");
             }else{
-                System.out.println("Entrei no else do usuário");
                 var passwordVerify = BCrypt.verifyer().verify(password.toCharArray(), databaseUsername.getPassword());
                 if(passwordVerify.verified){
-                    System.out.println("validei a senha");
+                    request.setAttribute("idUser", databaseUsername.getId());
                     filterChain.doFilter(request, response);
                 }else{
                     response.sendError(401);
                 }
             }
         }else{
-            System.out.println("Não segui o baile");
             filterChain.doFilter(request, response);
         }
     }

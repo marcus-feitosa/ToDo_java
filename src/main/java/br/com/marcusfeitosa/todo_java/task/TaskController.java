@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -39,6 +41,14 @@ public class TaskController {
     public List<TaskDTO> getAllUserTasks(HttpServletRequest request){
         var userId = request.getAttribute("idUser");
         return this.taskRepository.findByUserId((UUID)userId);
+    }
+
+    @PutMapping("/{id}")
+    public TaskDTO updateTask(@RequestBody TaskDTO taskDTO, HttpServletRequest request, @PathVariable UUID id){
+        var idUser = request.getAttribute("idUser");
+        taskDTO.setUserId((UUID)idUser);
+        taskDTO.setId(id);
+        return this.taskRepository.save(taskDTO);
     }
 }
 
